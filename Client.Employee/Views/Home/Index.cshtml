@@ -1,0 +1,183 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Employee</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Employee ID</th>
+                    <th>First Name</th>
+                    <th>Middle Name</th>
+                    <th>Last Name</th>
+                    <th>MobileNumber</th>
+                    <th>Email Address</th>
+                    <th>StatusId</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <input type="text" class="form-control hidden" id="employeeId" />
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" class="form-control" id="firstName" />
+        </div>
+        <div class="form-group">
+            <label>Middle Name</label>
+            <input type="text" class="form-control" id="middleName" />
+        </div>
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" class="form-control" id="lastName" />
+        </div>
+        <div class="form-group">
+            <label>Mobile Number</label>
+            <input type="text" class="form-control" id="mobileNumber" />
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="text" class="form-control" id="emailAddress" />
+        </div>
+        <div class="form-group">
+            <label>Status ID</label>
+            <input type="text" class="form-control" id="statusId" />
+        </div>
+        <button class="btn btn-primary" onclick="addEmployee()" type="button">Add New Employee</button>
+        <button class="btn btn-primary" onclick="updateEmployee()" type="button">Update Employee</button>
+    </div>
+</div>
+
+<script type="text/javascript">
+    window.addEventListener("load", (event) => {
+        bindEmployees();
+    });
+
+    function bindEmployees() {
+        var employees = $('#tableBody');
+        $.ajax({
+            type: 'GET',
+            url: 'https://localhost:44307/api/employee',
+            success: function (data) {
+                employees.empty();
+                $.each(data, function (index, val) {
+                    employees.append(
+                        '<tr>' +
+                        '<td>' + val.EmployeeId + '</td>' +
+                        '<td>' + val.FirstName + '</td>' +
+                        '<td>' + val.MiddleName + '</td>' +
+                        '<td>' + val.LastName + '</td>' +
+                        '<td>' + val.MobileNumber + '</td>' +
+                        '<td>' + val.EmailAddress + '</td>' +
+                        '<td>' + val.StatusId + '</td>' +
+                        '<td>' + '<button class="btn btn-primary btn-block" onclick="getEmployee(' + val.EmployeeId + ')">Edit</button>' +
+                        '<td>' + '<button class="btn btn-danger btn-block" onclick="deleteEmployee(' + val.EmployeeId + ')">Delete</button>' +
+                        '</tr>'
+                    )
+                });
+            },
+            error: function () {
+                alert("Error in retrieving the data")
+            }
+        });
+    }
+
+    function addEmployee() {
+        var firstName = document.getElementById('firstName').value;
+        var middleName = document.getElementById('middleName').value;
+        var lastName = document.getElementById('lastName').value;
+        var mobileNumber = document.getElementById('mobileNumber').value;
+        var emailAddress = document.getElementById('emailAddress').value;
+        var statusId = document.getElementById('statusId').value;
+
+        $.ajax({
+            type: 'POST',
+            url: 'https://localhost:44307/api/employee',
+            data: {
+                FirstName: firstName,
+                MiddleName: middleName,
+                LastName: lastName,
+                MobileNumber: mobileNumber,
+                EmailAddress: emailAddress,
+                StatusId:statusId
+            },
+            success: function () {
+                alert('Success!');
+                clearTextBoxes();
+                bindEmployees();
+            }
+        });
+    }
+
+    function clearTextBoxes() {
+        document.getElementById('firstName').value = '';
+        document.getElementById('middleName').value = '';
+        document.getElementById('lastName').value = '';
+        document.getElementById('mobileNumber').value = '';
+        document.getElementById('emailAddress').value = '';
+        document.getElementById('statusId').value = '';
+    }
+
+    function deleteEmployee(id) {
+        $.ajax({
+            type: 'GET',
+            url: 'https://localhost:44307/api/employee/' + id,
+            success: function () {
+                bindEmployees();
+            },
+            error: function () {
+                alert("Error in deleting the data")
+            }
+        });
+    }
+
+    function getEmployee(id) {
+        $.ajax({
+            type: 'GET',
+            url: 'https://localhost:44307/api/employee/' + id,
+            success: function (data) {
+                document.getElementById('employeeId').value = data.EmployeeId;
+                document.getElementById('firstName').value = data.FirstName;
+                document.getElementById('middleName').value = data.MiddleName;
+                document.getElementById('lastName').value = data.LastName;
+                document.getElementById('mobileNumber').value = data.MobileNumber;
+                document.getElementById('emailAddress').value = data.EmailAddress;
+                document.getElementById('statusId').value = data.StatusId;
+            }
+        });
+    }
+
+    function updateEmployee() {
+        var employeeId = document.getElementById('employeeId').value;
+        var firstName = document.getElementById('firstName').value;
+        var middleName = document.getElementById('middleName').value;
+        var lastName = document.getElementById('lastName').value;
+        var mobileNumber = document.getElementById('mobileNumber').value;
+        var emailAddress = document.getElementById('emailAddress').value;
+        var statusId = document.getElementById('statusId').value;
+
+        $.ajax({
+            type: 'PUT',
+            url: 'https://localhost:44307/api/employee',
+            data: {
+                EmployeeId: employeeId,
+                FirstName: firstName,
+                MiddleName: middleName,
+                LastName: lastName,
+                MobileNumber: mobileNumber,
+                EmailAddress: emailAddress,
+                StatusId: statusId
+            },
+            success: function () {
+                alert('Success!');
+                clearTextBoxes();
+                bindEmployees();
+            }
+        });
+    }
+</script>
